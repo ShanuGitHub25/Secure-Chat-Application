@@ -1,0 +1,569 @@
+/* ==========================================================================
+   ARKChat Global & Component Stylesheet
+   Path: src/assets/css/style.css
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. CSS Variables & Global Resets
+   -------------------------------------------------------------------------- */
+:root {
+  --bg-dark-primary: #131324;
+  --bg-dark-secondary: #00000076;
+  --bg-card: #080420;
+  --accent-purple: #4e0eff;
+  --accent-purple-hover: #4e0ede;
+  --accent-cyan: #4e0ede;
+  --text-white: #ffffff;
+  --text-muted: #808080;
+  --border-active: #00000096;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-dark-primary);
+  color: var(--text-white);
+  font-family: "Josefin Sans", sans-serif;
+}
+
+/* Scrollbar Customization */
+::-webkit-scrollbar {
+  width: 0.2rem;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #ffffff39;
+  width: 0.1rem;
+  border-radius: 1rem;
+}
+
+/* --------------------------------------------------------------------------
+   2. Auth Container (Register.jsx & Login.jsx)
+   -------------------------------------------------------------------------- */
+.auth-container {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+  align-items: center;
+  background-color: var(--bg-dark-primary);
+}
+
+.auth-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  background-color: var(--bg-dark-secondary);
+  border-radius: 2rem;
+  padding: 3rem 5rem;
+}
+
+.auth-container .brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.auth-container .brand img {
+  height: 5rem;
+}
+
+.auth-container .brand h1 {
+  color: var(--text-white);
+  text-transform: uppercase;
+}
+
+.auth-container input {
+  background-color: transparent;
+  padding: 1rem;
+  border: 0.1rem solid var(--accent-purple);
+  border-radius: 0.4rem;
+  color: var(--text-white);
+  width: 100%;
+  font-size: 1rem;
+}
+
+.auth-container input:focus {
+  border: 0.1rem solid #997af0;
+  outline: none;
+}
+
+.auth-container button {
+  background-color: var(--accent-purple);
+  color: var(--text-white);
+  padding: 1rem 2rem;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 0.4rem;
+  font-size: 1rem;
+  text-transform: uppercase;
+  transition: 0.5s ease-in-out;
+}
+
+.auth-container button:hover {
+  background-color: var(--accent-purple-hover);
+}
+
+.auth-container span {
+  color: var(--text-white);
+  text-transform: uppercase;
+}
+
+.auth-container span a {
+  color: var(--accent-purple);
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* --------------------------------------------------------------------------
+   3. Avatar Selection Container (SetAvatar.jsx)
+   -------------------------------------------------------------------------- */
+.avatar-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 3rem;
+  background-color: var(--bg-dark-primary);
+  height: 100vh;
+  width: 100vw;
+}
+
+.avatar-container .title-container h1 {
+  color: var(--text-white);
+}
+
+.avatar-container .avatars {
+  display: flex;
+  gap: 2rem;
+}
+
+.avatar-container .avatars .avatar {
+  border: 0.4rem solid transparent;
+  padding: 0.4rem;
+  border-radius: 5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: 0.5s ease-in-out;
+}
+
+.avatar-container .avatars .avatar img {
+  height: 6rem;
+  transition: 0.5s ease-in-out;
+}
+
+.avatar-container .avatars .selected {
+  border: 0.4rem solid var(--accent-purple);
+}
+
+.avatar-container .submit-btn {
+  background-color: var(--accent-purple);
+  color: var(--text-white);
+  padding: 1rem 2rem;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 0.4rem;
+  font-size: 1rem;
+  text-transform: uppercase;
+  transition: 0.5s ease-in-out;
+}
+
+.avatar-container .submit-btn:hover {
+  background-color: var(--accent-purple-hover);
+}
+
+/* --------------------------------------------------------------------------
+   4. Chat Layout Container (Chat.jsx)
+   -------------------------------------------------------------------------- */
+.chat-layout-container {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+  align-items: center;
+  background-color: var(--bg-dark-primary);
+}
+
+.chat-layout-container .container {
+  height: 85vh;
+  width: 85vw;
+  background-color: var(--bg-dark-secondary);
+  display: grid;
+  grid-template-columns: 25% 75%;
+}
+
+@media screen and (min-width: 720px) and (max-width: 1080px) {
+  .chat-layout-container .container {
+    grid-template-columns: 35% 65%;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   5. Contacts Sidebar (Contacts.jsx)
+   -------------------------------------------------------------------------- */
+
+.contacts-container .brand {
+  background-color: rgb(28, 28, 28);
+}
+
+.contacts-container .contacts {
+  background-color: rgb(28, 28, 28);
+}
+
+.contacts-container .contacts .selected {
+  background-color: rgb(76, 46, 209);
+}
+
+.contacts-container .current-user {
+  background-color: rgb(28, 28, 28);
+}
+
+/* Settings Icon & Popover Container */
+.contacts-container .current-user .settings-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.contacts-container .current-user .settings-container .settings-icon {
+  font-size: 1.8rem;
+  color: var(--text-white);
+  cursor: pointer;
+  transition: transform 0.35s ease;
+}
+
+.contacts-container .current-user .settings-container .settings-icon.active {
+  transform: rotate(180deg);
+}
+
+.contacts-container {
+  display: grid;
+  grid-template-rows: 10% 75% 15%;
+  overflow: hidden;
+  background-color: var(--bg-card);
+}
+
+.contacts-container .brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.contacts-container .brand img {
+  height: 2rem;
+}
+
+.contacts-container .brand h3 {
+  color: var(--text-white);
+  text-transform: uppercase;
+}
+
+.contacts-container .contacts {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: auto;
+  gap: 0.8rem;
+}
+
+.contacts-container .contacts .contact {
+  background-color: #ffffff34;
+  min-height: 5rem;
+  cursor: pointer;
+  width: 90%;
+  border-radius: 0.2rem;
+  padding: 0.4rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  transition: 0.5s ease-in-out;
+}
+
+.contacts-container .contacts .contact .avatar img {
+  height: 3rem;
+}
+
+.contacts-container .contacts .contact .username h3 {
+  color: var(--text-white);
+}
+
+.contacts-container .contacts .selected {
+  background-color: #9a86f3;
+}
+
+.contacts-container .current-user {
+  background-color: #0d0d30;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+}
+
+.contacts-container .current-user .avatar img {
+  height: 4rem;
+  max-inline-size: 100%;
+}
+
+.contacts-container .current-user .username h2 {
+  color: var(--text-white);
+}
+
+@media screen and (min-width: 720px) and (max-width: 1080px) {
+  .contacts-container .contacts .contact .username h3 {
+    font-size: 1rem;
+  }
+
+  .contacts-container .current-user {
+    gap: 0.5rem;
+  }
+
+  .contacts-container .current-user .username h2 {
+    font-size: 1rem;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   6. Welcome Screen (Welcome.jsx)
+   -------------------------------------------------------------------------- */
+.welcome-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--text-white);
+  flex-direction: column;
+}
+
+.welcome-container img {
+  height: 20rem;
+}
+
+.welcome-container span {
+  color: #4e0ede;
+}
+
+/* --------------------------------------------------------------------------
+   7. Chat Room & Messages (ChatContainer.jsx)
+   -------------------------------------------------------------------------- */
+.chat-room-container {
+  padding-top: 1rem;
+  display: grid;
+  grid-template-rows: 10% 78% 12%;
+  gap: 0.1rem;
+  overflow: hidden;
+}
+
+.chat-room-container .chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2rem;
+}
+
+.chat-room-container .chat-header .user-details {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.chat-room-container .chat-header .user-details .avatar img {
+  height: 3rem;
+}
+
+.chat-room-container .chat-header .user-details .username h3 {
+  color: var(--text-white);
+}
+
+.chat-room-container .chat-messages {
+  padding: 1rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow: auto;
+}
+
+.chat-room-container .chat-messages .message {
+  display: flex;
+  align-items: center;
+}
+
+.chat-room-container .chat-messages .message .content {
+  max-width: 40%;
+  overflow-wrap: break-word;
+  padding: 1rem;
+  font-size: 1.1rem;
+  border-radius: 1rem;
+  color: #d1d1d1;
+}
+
+.chat-room-container .chat-messages .sended {
+  justify-content: flex-end;
+}
+
+.chat-room-container .chat-messages .sended .content {
+  background-color: #4f04ff21;
+}
+
+.chat-room-container .chat-messages .recieved {
+  justify-content: flex-start;
+}
+
+.chat-room-container .chat-messages .recieved .content {
+  background-color: #9900ff20;
+}
+
+@media screen and (min-width: 720px) and (max-width: 1080px) {
+  .chat-room-container {
+    grid-template-rows: 15% 70% 15%;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   8. Chat Input & Emoji Picker (ChatInput.jsx)
+   -------------------------------------------------------------------------- */
+.chat-input-container {
+  display: grid;
+  align-items: center;
+  grid-template-columns: 5% 95%;
+  background-color: #080420;
+  padding: 0 2rem;
+}
+
+.chat-input-container .button-container {
+  display: flex;
+  align-items: center;
+  color: var(--text-white);
+  gap: 1rem;
+}
+
+.chat-input-container .button-container .emoji {
+  position: relative;
+}
+
+.chat-input-container .button-container .emoji svg {
+  font-size: 1.5rem;
+  color: #ffff00c8;
+  cursor: pointer;
+}
+
+.chat-input-container .button-container .emoji .emoji-picker-react {
+  position: absolute;
+  top: -350px;
+  background-color: #080420;
+  box-shadow: 0 5px 10px #9a86f3;
+  border-color: #9a86f3;
+}
+
+.chat-input-container .button-container .emoji .emoji-picker-react .emoji-scroll-wrapper::-webkit-scrollbar {
+  background-color: #080420;
+  width: 5px;
+}
+
+.chat-input-container .button-container .emoji .emoji-picker-react .emoji-scroll-wrapper::-webkit-scrollbar-thumb {
+  background-color: #9a86f3;
+}
+
+.chat-input-container .button-container .emoji .emoji-picker-react .emoji-categories button {
+  filter: contrast(0);
+}
+
+.chat-input-container .button-container .emoji .emoji-picker-react .emoji-search {
+  background-color: transparent;
+  border-color: #9a86f3;
+}
+
+.chat-input-container .button-container .emoji .emoji-picker-react .emoji-group:before {
+  background-color: #080420;
+}
+
+.chat-input-container .input-container {
+  width: 100%;
+  border-radius: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  background-color: #ffffff34;
+}
+
+.chat-input-container .input-container input {
+  width: 90%;
+  height: 60%;
+  background-color: transparent;
+  color: var(--text-white);
+  border: none;
+  padding-left: 1rem;
+  font-size: 1.2rem;
+}
+
+.chat-input-container .input-container input&::selection {
+  background-color: #9a86f3;
+}
+
+.chat-input-container .input-container input:focus {
+  outline: none;
+}
+
+.chat-input-container .input-container button {
+  padding: 0.3rem 2rem;
+  border-radius: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--accent-purple);
+  border: none;
+}
+
+.chat-input-container .input-container button svg {
+  font-size: 2rem;
+  color: var(--text-white);
+}
+
+@media screen and (min-width: 720px) and (max-width: 1080px) {
+  .chat-input-container {
+    padding: 0 1rem;
+    gap: 1rem;
+  }
+
+  .chat-input-container .button-container .emoji svg {
+    font-size: 1.2rem;
+  }
+
+  .chat-input-container .input-container input {
+    font-size: 1rem;
+  }
+
+  .chat-input-container .input-container button svg {
+    font-size: 1rem;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   9. Logout Button (Logout.jsx)
+   -------------------------------------------------------------------------- */
+.logout-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  background-color: var(--accent-purple);
+  border: none;
+  cursor: pointer;
+}
+
+.logout-button svg {
+  font-size: 1.3rem;
+  color: #ebe7ff;
+}

@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { IoSettings } from "react-icons/io5";
 import styled from "styled-components";
-import Logo from "../assets/logo.svg";
+import Logo from "../assets/logo/logo.svg";
+
+import Settings from "./Settings";
 
 export default function Contacts({ contacts, changeChat }) {
   const [currentUserName, setCurrentUserName] = useState(undefined);
@@ -17,6 +20,23 @@ export default function Contacts({ contacts, changeChat }) {
     setCurrentSelected(index);
     changeChat(contact);
   };
+  const [showSettings, setShowSettings] = useState(false);
+  const settingsRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        settingsRef.current &&
+        !settingsRef.current.contains(e.target)
+      ) {
+        setShowSettings(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
   return (
     <>
       {currentUserImage && currentUserImage && (
@@ -30,9 +50,8 @@ export default function Contacts({ contacts, changeChat }) {
               return (
                 <div
                   key={contact._id}
-                  className={`contact ${
-                    index === currentSelected ? "selected" : ""
-                  }`}
+                  className={`contact ${index === currentSelected ? "selected" : ""
+                    }`}
                   onClick={() => changeCurrentChat(index, contact)}
                 >
                   <div className="avatar">
@@ -57,6 +76,14 @@ export default function Contacts({ contacts, changeChat }) {
             </div>
             <div className="username">
               <h2>{currentUserName}</h2>
+            </div>
+            <div className="settings-container" ref={settingsRef}>
+              <IoSettings
+                className={`settings-icon ${showSettings ? "active" : ""}`}
+                onClick={() => setShowSettings(prev => !prev)}
+              />
+
+              {showSettings && <Settings />}
             </div>
           </div>
         </Container>
@@ -151,4 +178,20 @@ const Container = styled.div`
       }
     }
   }
+  .settings-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.settings-icon {
+  font-size: 1.8rem;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.35s ease;
+}
+
+.settings-icon.active {
+  transform: rotate(180deg);
+}
 `;

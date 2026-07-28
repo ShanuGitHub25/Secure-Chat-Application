@@ -2,13 +2,15 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import styled from "styled-components";
 import { useNavigate, Link } from "react-router-dom";
-import Logo from "../assets/logo.svg";
+import Logo from "../assets/logo/logo.svg";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { loginRoute } from "../utils/APIRoutes";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function Login() {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
   const [values, setValues] = useState({ username: "", password: "" });
   const toastOptions = {
     position: "bottom-right",
@@ -76,16 +78,32 @@ export default function Login() {
             onChange={(e) => handleChange(e)}
             min="3"
           />
-          <input
+          {/* <input
             type="password"
             placeholder="Password"
             name="password"
             onChange={(e) => handleChange(e)}
-          />
+          /> */}
+          <div className="password-field">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              name="password"
+              onChange={(e) => handleChange(e)}
+            />
+            <button
+              type="button"
+              className="toggle-password"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </button>
+          </div>
           <button type="submit">Log In</button>
           <span>
             Don't have an account ? <Link to="/register">Create One.</Link>
           </span>
+          <span>Forgot password ?</span>
         </form>
       </FormContainer>
       <ToastContainer />
@@ -154,10 +172,41 @@ const FormContainer = styled.div`
   span {
     color: white;
     text-transform: uppercase;
+    text-align: center;
     a {
       color: #4e0eff;
       text-decoration: none;
       font-weight: bold;
     }
   }
+    .password-field {
+  position: relative;
+  width: 100%;
+}
+
+.password-field input {
+  width: 100%;
+  padding-right: 5rem;
+  box-sizing: border-box;
+}
+
+.toggle-password {
+  position: absolute;
+  top: 56%;
+  right: 0.7rem;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #4e0eff; //#997af0
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-transform: none;
+  padding: 0;
+}
+
+.toggle-password:hover {
+  color: #ffffff;
+  background: transparent;
+}
 `;
