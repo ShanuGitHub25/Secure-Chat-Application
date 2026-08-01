@@ -30,7 +30,7 @@ const server = app.listen(process.env.PORT, () =>
 );
 const io = socket(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: ["http://localhost:3000", "http://localhost:3001"],
     credentials: true,
   },
 });
@@ -39,13 +39,26 @@ global.onlineUsers = new Map();
 io.on("connection", (socket) => {
   global.chatSocket = socket;
   socket.on("add-user", (userId) => {
-    onlineUsers.set(userId, socket.id);
+    if (userId) {
+      global.onlineUsers.set(userId, socket.id);
+    }
   });
 
   socket.on("send-msg", (data) => {
-    const sendUserSocket = onlineUsers.get(data.to);
+    if (!data?.to || !data?.msg) return;
+    const sendUserSocket = global.onlineUsers.get(data.to);
     if (sendUserSocket) {
       socket.to(sendUserSocket).emit("msg-recieve", data.msg);
+    }
+  });
+
+  socket.on("disconnect", () => {
+    const disconnectedUserId = [...global.onlineUsers.entries()].find(
+      ([, socketId]) => socketId === socket.id
+    )?.[0];
+
+    if (disconnectedUserId) {
+      global.onlineUsers.delete(disconnectedUserId);
     }
   });
 });

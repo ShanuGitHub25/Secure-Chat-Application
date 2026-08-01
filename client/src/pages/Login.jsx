@@ -5,8 +5,9 @@ import { useNavigate, Link } from "react-router-dom";
 import Logo from "../assets/logo/logo.svg";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { loginRoute } from "../utils/APIRoutes";
+import { loginRoute, setPublicKeyRoute } from "../utils/APIRoutes";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { ensureE2EEKeyPair } from "../utils/e2ee";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ export default function Login() {
     if (localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)) {
       navigate("/");
     }
-  }, []);
+  }, [navigate]);
 
   const handleChange = (event) => {
     setValues({ ...values, [event.target.name]: event.target.value });
@@ -57,6 +58,10 @@ export default function Login() {
           process.env.REACT_APP_LOCALHOST_KEY,
           JSON.stringify(data.user)
         );
+        const { publicKeyJwk } = await ensureE2EEKeyPair(data.user._id);
+        await axios.post(`${setPublicKeyRoute}/${data.user._id}`, {
+          publicKey: publicKeyJwk,
+        });
 
         navigate("/");
       }

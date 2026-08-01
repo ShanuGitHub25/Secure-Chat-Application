@@ -4,61 +4,163 @@ import ChatInput from "./ChatInput";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { sendMessageRoute, recieveMessageRoute } from "../utils/APIRoutes";
+import { decryptMessage, ensureE2EEKeyPair, encryptMessage, parsePublicKey } from "../utils/e2ee";
 
 export default function ChatContainer({ currentChat, socket }) {
   const [messages, setMessages] = useState([]);
   const scrollRef = useRef();
   const [arrivalMessage, setArrivalMessage] = useState(null);
 
-  useEffect(async () => {
-    const data = await JSON.parse(
-      localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
-    );
-    const response = await axios.post(recieveMessageRoute, {
-      from: data._id,
-      to: currentChat._id,
-    });
-    setMessages(response.data);
-  }, [currentChat]);
-
   useEffect(() => {
-    const getCurrentChat = async () => {
-      if (currentChat) {
-        await JSON.parse(
-          localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
-        )._id;
-      }
+    const loadMessages = async () => {
+      if (!currentChat) return;
+
+      const storedUser = localStorage.getItem(
+        process.env.REACT_APP_LOCALHOST_KEY
+      );
+      if (!storedUser) return;
+
+      const data = JSON.parse(storedUser);
+      if (!data?._id) return;
+
+      const response = await axios.post(recieveMessageRoute, {
+        from: data._id,
+        to: currentChat._id,
+      });
+
+      const { privateKeyJwk } = await ensureE2EEKeyPair(data._id);
+      const peerPublicKey = parsePublicKey(currentChat.publicKey);
+      const decryptedMessages = await Promise.all(
+        response.data.map(async (message) => {
+          if (!message.ciphertext || !message.iv) {
+            return {
+              ...message,
+              message: message.message || "[Encrypted message unavailable]",
+            };
+          }
+
+          // Skip decryption if we don't have a valid peer public key
+          if (!peerPublicKey) {
+            return {
+              ...message,
+              message: "[Cannot decrypt - invalid key]",
+            };
+          }
+
+          const decrypted = await decryptMessage(
+            message.ciphertext,
+            message.iv,
+            peerPublicKey,
+            privateKeyJwk
+          );
+
+          return {
+            ...message,
+            message: decrypted?.decryptionFailed
+              ? "[Unable to decrypt]"
+              : decrypted?.message || "[Encrypted message unavailable]",
+          };
+        })
+      );
+
+      setMessages(decryptedMessages);
     };
-    getCurrentChat();
+
+    loadMessages();
   }, [currentChat]);
 
   const handleSendMsg = async (msg) => {
-    const data = await JSON.parse(
-      localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
+    const storedUser = localStorage.getItem(
+      process.env.REACT_APP_LOCALHOST_KEY
     );
-    socket.current.emit("send-msg", {
+    if (!storedUser) return;
+
+    const data = JSON.parse(storedUser);
+    if (!data?._id) return;
+
+    if (!currentChat?.publicKey) {
+      console.warn("[E2EE] Cannot send message - no peer public key");
+      return;
+    }
+
+    const peerPublicKey = parsePublicKey(currentChat.publicKey);
+    if (!peerPublicKey) {
+      console.warn("[E2EE] Cannot send message - invalid peer public key");
+      return;
+    }
+
+    const { privateKeyJwk } = await ensureE2EEKeyPair(data._id);
+    const encryptedPayload = await encryptMessage(
+      msg,
+      peerPublicKey,
+      privateKeyJwk
+    );
+
+    if (!encryptedPayload) {
+      return;
+    }
+
+    const outgoingMessage = {
+      ...encryptedPayload,
+      from: data._id,
+      to: currentChat._id,
+      timestamp: Date.now(),
+    };
+
+    socket.current?.emit("send-msg", {
       to: currentChat._id,
       from: data._id,
-      msg,
+      msg: outgoingMessage,
     });
+
     await axios.post(sendMessageRoute, {
       from: data._id,
       to: currentChat._id,
-      message: msg,
+      message: encryptedPayload,
     });
 
-    const msgs = [...messages];
-    msgs.push({ fromSelf: true, message: msg });
-    setMessages(msgs);
+    setMessages((prev) => [
+      ...prev,
+      { fromSelf: true, message: msg, _id: uuidv4() },
+    ]);
   };
 
   useEffect(() => {
-    if (socket.current) {
-      socket.current.on("msg-recieve", (msg) => {
-        setArrivalMessage({ fromSelf: false, message: msg });
+    if (!socket.current || !currentChat) return;
+
+    const currentSocket = socket.current;
+    const handleIncomingMessage = async (msg) => {
+      if (!msg || msg.from !== currentChat._id) return;
+
+      const storedUser = localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY);
+      const currentUser = storedUser ? JSON.parse(storedUser) : null;
+      const { privateKeyJwk } = await ensureE2EEKeyPair(currentUser?._id);
+      const peerPublicKey = parsePublicKey(currentChat.publicKey);
+      if (!peerPublicKey) {
+        setArrivalMessage({
+          fromSelf: false,
+          message: "[Cannot decrypt - invalid key]",
+        });
+        return;
+      }
+      const decrypted = await decryptMessage(
+        msg.ciphertext,
+        msg.iv,
+        peerPublicKey,
+        privateKeyJwk
+      );
+
+      setArrivalMessage({
+        fromSelf: false,
+        message: decrypted?.decryptionFailed
+          ? "[Unable to decrypt]"
+          : decrypted?.message || "[Encrypted message unavailable]",
       });
-    }
-  }, []);
+    };
+
+    currentSocket.on("msg-recieve", handleIncomingMessage);
+    return () => currentSocket.off("msg-recieve", handleIncomingMessage);
+  }, [currentChat, socket]);
 
   useEffect(() => {
     arrivalMessage && setMessages((prev) => [...prev, arrivalMessage]);
