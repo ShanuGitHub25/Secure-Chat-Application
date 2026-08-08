@@ -55,14 +55,22 @@ export function parsePublicKey(publicKey) {
     return publicKey;
   }
   
-  // Try to parse as JSON
   if (typeof publicKey === 'string') {
+    // Try direct JSON string parsing
     try {
       const parsed = JSON.parse(publicKey);
       if (parsed.kty) return parsed;
     } catch (e) {
-      // Not JSON, it's a base64 string or other format
-      return null;
+      // Continue to next fallback
+    }
+
+    // Try base64-decoding a JSON JWK payload
+    try {
+      const decoded = window.atob(publicKey);
+      const parsed = JSON.parse(decoded);
+      if (parsed.kty) return parsed;
+    } catch (e) {
+      // Not base64 JSON either
     }
   }
   

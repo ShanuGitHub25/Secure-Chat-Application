@@ -54,9 +54,22 @@ export default function SetAvatar() {
     }
 
     try {
-      const user = JSON.parse(
-        localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY)
+      const storedUser = localStorage.getItem(
+        process.env.REACT_APP_LOCALHOST_KEY
       );
+      if (!storedUser) {
+        toast.error("User session expired. Please log in again.", toastOptions);
+        navigate("/login");
+        return;
+      }
+
+      const user = JSON.parse(storedUser);
+      if (!user?._id) {
+        toast.error("User session expired. Please log in again.", toastOptions);
+        localStorage.removeItem(process.env.REACT_APP_LOCALHOST_KEY);
+        navigate("/login");
+        return;
+      }
 
       const { data } = await axios.post(
         `${setAvatarRoute}/${user._id}`,
