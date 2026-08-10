@@ -39,4 +39,4 @@ Command: yarn start OR npm start
 Command: yarn start OR npm start
 ## And the chat application would be running successfully by now.
 
-Designed & Developed by Arpan Kumar.
+Designed & Developed by Karri Chaitanya.
